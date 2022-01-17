@@ -18,7 +18,7 @@ const stripe = require('stripe')('sk_live_51IHOmdANB2BmoDlXV2uu5jPDJJ9BKXxPU03RH
 
 const getIndex = async (req, res, next) => {
     res.render('shop/index', {
-        pageTitle: 'Shop',
+        pageTitle: 'Indian Flavours Byford Online',
         path: '/'
     });
 };
@@ -43,7 +43,7 @@ const getAllItems = async (req, res, next) => {
         res.render('shop/product-list', {
             familyPack: familyPackArray,
             category: category,
-            pageTitle: 'Shop',
+            pageTitle: 'Indian Flavours Byford Online',
             path: '/products',
             hasItems: familyPack.length > 0,
             activeShop: true,
@@ -121,7 +121,7 @@ const addToCart = async (req, res, next) => {
 }
 
 const getCart = async (req, res, next) => {
-    res.render('shop/cart', { cart: Cart.getCart(), pageTitle: 'Shopping Cart Detail', path: '/cart', name: 'Edward' })
+    res.render('shop/cart', { cart: Cart.getCart(), pageTitle: 'Indian Flavours Byford Online Cart', path: '/cart', name: 'Edward' })
 }
 
 const getCheckout = async(req, res, next) => {
@@ -131,11 +131,11 @@ const getCheckout = async(req, res, next) => {
         return res.redirect('/menu');
     }
     const { cart } = req.session;
-    res.render('shop/checkout', { delivery: delivery, pageTitle: 'Shopping Cart Detail', path: '/cart', name: 'Edward' })
+    res.render('shop/checkout', { delivery: delivery, pageTitle: 'Indian Flavours Byford Online Checkout', path: '/cart', name: 'Edward' })
 };
 
 const orderConfirm = async(req, res, next) => {
-    res.render('shop/confirm', { cart: Cart.getCart(), pageTitle: 'Thankyou', path: '/shop', name: '' })
+    res.render('shop/confirm', { cart: Cart.getCart(), pageTitle: 'Indian Flavours Byford Online Confirm', path: '/shop', name: '' })
 };
 
 const getCheckoutSuccess = async(req, res, next) => {
@@ -150,9 +150,11 @@ const getCheckoutSuccess = async(req, res, next) => {
         const lastOneRes = await ordersRef.orderBy('creationDate', 'desc').limit(1).get();
 
         var orderDocRef = firestore.collection('orders').doc();
-        let count = 0
+        let count = 0;
+	let total = 0;
         for (let productId in req.session.cart.items) {
             count += req.session.cart.items[productId].qty;
+	    total = total +req.session.cart.items[productId].item.price*req.session.cart.items[productId].qty;
         }
         let ordrNo = '';
         lastOneRes.forEach(doc => {
@@ -166,30 +168,33 @@ const getCheckoutSuccess = async(req, res, next) => {
 			var month = dateObj.getUTCMonth() + 1; //months from 1-12
 			var day = dateObj.getUTCDate();
 			var year = dateObj.getUTCFullYear();
-			
-			newdate = year+""+month+""+day;
-            const orderNumber = "O-"+newdate+"-0"+increasedNum;
-            const totalPrice = req.session.cart.shippingCharge+req.session.cart.totalPrice;
-        orderDocRef.set({
+var dt = new Date();
+			newdate = dt.getFullYear() + '' + (((dt.getMonth() + 1) < 10) ? '0' : '') + (dt.getMonth() + 1) + '' + ((dt.getDate() < 10) ? '0' : '') + dt.getDate();
+            		const orderNumber = "O-"+newdate+"-0"+increasedNum;
+            		const totalPrice = total;
+var deliveryTiming = year+"-"+month+"-"+day+" "+dateObj.getUTCHours()+":"+dateObj.getUTCMinutes()+":"+dateObj.getUTCSeconds()+"."+Math.floor(100000 + Math.random() * 900000);
+	orderDocRef.set({
             collected: 'No',            
-            count: count,
+            count: count.toString(),
             createdBy: data.data().name,
             creationByUid: id,
             creationDate: firebase1.firestore.FieldValue.serverTimestamp(),
             customerAddress: data.data().address,
             customerName: data.data().name,
+            customerEmail: data.data().email,
             customerPhoneNumber: data.data().mobileNumber,
             deliveryAmount: req.session.cart.shippingCharge.toString(),
-            deliveryTiming: firebase1.firestore.FieldValue.serverTimestamp(),
+deliveryTiming: deliveryTiming,
             documentId: orderDocRef.id,
             orderFrom: 'WEB',
             orderNumber: orderNumber,
             orderType: req.session.order.orderType,
-            paidType:'Stripe',
+            paidType:'STRIPE',
             price: totalPrice.toString(),
             status: 'PENDING',
             tableNumber:''
         })
+
         let orderItemEntity = {};
         for(let productId of Object.values(req.session.cart.items)) {					
             orderItemEntity['count'] = productId.qty;				

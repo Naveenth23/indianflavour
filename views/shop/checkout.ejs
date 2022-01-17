@@ -1,11 +1,12 @@
 <%- include('../includes/head.ejs') %>
 <%- include('../includes/navigation.ejs') %>
+<script src="https://js.stripe.com/v3/"></script>
 <div class="breadcrumb_section background_bg overlay_bg_50 page_title_light" data-img-src="/images/slider/banner4.jpeg">
     <div class="container"><!-- STRART CONTAINER -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="page-title">
-            		<h1>Checkout</h1>
+                   <h1>Checkout</h1>
                 </div>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -18,8 +19,8 @@
 <div class="section">
 	<div class="container">
         <div class="row">
-        	<div class="col-12">
-            	<div class="medium_divider clearfix"></div>
+		<div class="col-12">
+                <div class="medium_divider clearfix"></div>
             </div>
         </div>
         <div class="row">
@@ -59,14 +60,14 @@
                             </div>
                         </div>
                     </div>
-                   <!-- <div class="form-group create-account col-md-12" id="create_account">
+                    <div class="form-group create-account col-md-12" id="create_account">
                         <div class="chek-form">
                             <div class="custome-radio">
                                 <input class="form-radio-input" type="radio" name="pickupType" value="pay_now" id="pay_now">
                                 <label class="form-radio-label label_info" for="pickupType"><span>Pay Now</span></label>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="ship_detail col-md-12 form-group">
                     	<div class="chek-form">
                             <div class="custome-checkbox">
@@ -76,7 +77,8 @@
                         </div>
                     </div>
                    	<div class="different_address col-md-12" id="different_address" style="display:none;">
-                       <!-- <div class="form-group">
+                        <input type="hidden" class="form-control" name="shippingCharge" id="shippingCharge">
+                        <div class="form-group">
                             <input type="text" class="form-control" name="address" id="address" placeholder="Street name & Number *">
                         </div>
                         <div class="form-group">
@@ -84,7 +86,7 @@
                         </div>
                         <div class="form-group">
                             <input class="form-control" type="text" name="postcode" id="pincode" placeholder="Postcode, Block, Intercom, Where to Park *" readonly="readonly">
-                        </div>-->
+                        </div>
                     </div>
                     <div class="form-group col-md-12">
                         <button type="submit" class="btn btn-default">
@@ -119,11 +121,11 @@
                             <tfoot>
                                 <tr>
                                     <th>Delivery</th>
-                                    <td id="delivery_charges">$0</td>
+                                    <td id="delivery_charges">$<span>0</span></td>
                                 </tr>
                                 <tr>
                                     <th>Total</th>
-                                    <td class="product-subtotal" id="product-subtotal">$<%= (total+session.cart.shippingCharge).toFixed(2) %></td>
+                                    <td class="product-subtotal" id="product-subtotal">$<span><%= (total+session.cart.shippingCharge).toFixed(2) %></span></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -133,18 +135,8 @@
         </div>
     </div>
 </div>
-<div id="popup" style="display:none;">
-    <div class="heading_s1">
-        <span class="sub_heading font_style1">At the moment, delivery is not available from website. Download the app and delivery from there .</span>
-        <h2>Download Mobile App</h2>
-    </div>
-    <div class="payment_option">
-        <a class="btn btn-dark btn-radius" href="https://apps.apple.com/in/app/indian-flavours/id1594120193" target="-blank"><i class="ion-social-apple"></i>App Store</a>
-        <a class="btn btn-default btn-radius" href="https://play.google.com/store/apps/details?id=com.ballisolutionsau.indianflavoursbyford.indianflavours" target="-blank"><i class="ion-social-android"></i>Play Store</a>
-    </div>
-</div>
 
-<!-- <div id="popup" style="display:none;">
+<div id="popup" style="display:none;">
     <div class="heading_s1">
         <h4>DELIVERY AVAILABLE</h4>
     </div>
@@ -190,7 +182,7 @@
             <% } %>
         <% } %>
     </div>
-</div>-->
+</div>
 <%- include('../includes/foot.ejs') %>
 <%- include('../includes/end.ejs') %>
 
@@ -218,12 +210,15 @@
             var area = matches[0];
             var price = matches[1];
             var pincode = matches[2];
-            
+            var total_price = parseFloat($('#product-subtotal > span').html());
+            $('#shippingCharge').val(price);
             $('#city').val(toTitleCase(area));
             $('#pincode').val(pincode);
-            $.post('update-total', { price:price}, function(data){
-                $('#delivery_charges').html('$'+price);
-                $('#product-subtotal').html('$'+data.total);
+            $('#delivery_charges > span').html(price);
+            $('#product-subtotal > span').html(total_price+parseFloat(price));
+            $.post('update-total', { price:total_price+parseFloat(price),shipping: parseFloat(price)}, function(data){
+                // $('#delivery_charges').html('$'+price);
+                // $('#product-subtotal').html('$'+data.total);
             });
             $('.close').trigger('click');
         } else {
@@ -257,19 +252,27 @@
     }
     var differentaddress = document.getElementById("differentaddress");
     var different_address = document.getElementById("different_address");
-    
+    different_address.style.display = "none";
     if (differentaddress.checked == true){
         $(this).simplePopup(options);
         $("input:radio").removeAttr("checked");
         $("input:radio").attr("checked", false);
         $('#address').prop('required', true);
-        different_address.style.display = "block";
+        different_address.style.display = "none";
     } else {
+        var price = parseFloat($('#delivery_charges > span').html());
+        var total_price = parseFloat($('#product-subtotal > span').html());
+        total_price = total_price - price;
         $('#city').val('');
         $('#pincode').val('');
-        $.post('remove-delivery', function(data){
-            $('#delivery_charges').html('$0');
-            $('#product-subtotal').html('$'+data.total);
+        $('#delivery_charges > span').html('0');
+        $('#product-subtotal > span').html(total_price);
+        // $.post('remove-delivery', function(data){
+        //     $('#delivery_charges').html('$0');
+        //     $('#product-subtotal').html('$'+data.total);
+        // });
+        $.post('remove-delivery', { price:total_price}, function(data){
+            $('#shippingCharge').val('');
         });
         $('#address').prop('required', false);
         different_address.style.display = "none";
