@@ -58,7 +58,7 @@
                                                 </button>
                                             </div>
                                         </td>
-                                        <td class="product-subtotal" data-title="Total">$<%= pizza.item.price * pizza.qty %></td>
+                                        <td class="product-subtotal" data-title="Total">$<%= (pizza.item.price * pizza.qty).toFixed(2) %></td>
                                         <td class="product-remove" data-title="Remove">
                                             <a href="javascript:void(0)" onclick="removeFromCartView(event, '<%= pizza.item.id %>')" class="btn btn-icon btn-sm btn-soft-primary btn-circle">
                                                 <i class="ti-close"></i>

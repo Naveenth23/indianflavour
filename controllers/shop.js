@@ -173,6 +173,13 @@ var dt = new Date();
             		const orderNumber = "O-"+newdate+"-0"+increasedNum;
             		const totalPrice = total;
 var deliveryTiming = year+"-"+month+"-"+day+" "+dateObj.getUTCHours()+":"+dateObj.getUTCMinutes()+":"+dateObj.getUTCSeconds()+"."+Math.floor(100000 + Math.random() * 900000);
+let deliveryAmount = 0;
+        let order_type = 'PICKUP';
+        console.log(req.session.order.orderType);
+        if(req.session.order.orderType === 'DELIVERY'){
+            deliveryAmount = req.session.cart.shippingCharge;
+            order_type = 'DELIVERY';
+        }
 	orderDocRef.set({
             collected: 'No',            
             count: count.toString(),
@@ -183,14 +190,14 @@ var deliveryTiming = year+"-"+month+"-"+day+" "+dateObj.getUTCHours()+":"+dateOb
             customerName: data.data().name,
             customerEmail: data.data().email,
             customerPhoneNumber: data.data().mobileNumber,
-            deliveryAmount: req.session.cart.shippingCharge.toString(),
-deliveryTiming: deliveryTiming,
+            deliveryAmount: deliveryAmount.toString(),
+	    deliveryTiming: deliveryTiming,
             documentId: orderDocRef.id,
             orderFrom: 'WEB',
             orderNumber: orderNumber,
-            orderType: req.session.order.orderType,
+            orderType: order_type,
             paidType:'STRIPE',
-            price: totalPrice.toString(),
+            price: totalPrice.toFixed(2),
             status: 'PENDING',
             tableNumber:''
         })
@@ -207,7 +214,7 @@ deliveryTiming: deliveryTiming,
             orderItemEntity['orderId'] = orderDocRef.id;
             orderItemEntity['orderItemId'] = productId.item.id;	
             orderItemEntity['price'] = productId.item.price;
-            orderItemEntity['totalPrice'] = productId.item.price * productId.qty;
+orderItemEntity['totalPrice'] = ParseFloat(productId.item.price * productId.qty,2);
            firestore.collection("orderitems").add(orderItemEntity)
         }
         await firestore.collection('users').doc(id).delete();
@@ -332,6 +339,12 @@ const postBooking = async (req, res, next) => {
     }
     
 };
+
+function ParseFloat(str,val) {
+    str = str.toString();
+    str = str.slice(0, (str.indexOf(".")) + val + 1); 
+    return Number(str);   
+}
 
 module.exports = {
   getAllItems,

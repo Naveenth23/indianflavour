@@ -10,6 +10,13 @@ PAGE JS
 
 (function($) {
 	'use strict';
+	$.fn.exists = function() {
+        	return 0 < this.length
+    	}, $(".tm-preloader .tm-button").on("click", function() {
+        	$(".tm-preloader").fadeOut()
+    	}), $(window).on("load", function() {
+        	$(".tm-preloader").fadeOut()
+    	});
 	
 	/*===================================*
 	01. LOADING JS

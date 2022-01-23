@@ -112,11 +112,11 @@ function orderController(){
 			// }
 			const data = req.body;
 				let count = 0
-let total1 = 0;
+let total = 0;
 			for (let productId in req.session.cart.items) {
-				count += req.session.cart.items[productId].qty;
-total1 = total1 +req.session.cart.items[productId].item.price*req.session.cart.items[productId].qty;
-		}
+	
+			count += req.session.cart.items[productId].qty;
+			}
 			 
 			try {
 				if(ordertype ==='delivery'){
@@ -148,7 +148,7 @@ email:email,
 					lastOneRes.forEach(doc => {
 						ordrNo = doc.data().orderNumber;
 					});
-const totalPrice = total1;
+
 					const pieces = ordrNo.split(/[\s-]+/)
 					const last = pieces[pieces.length - 1]
 					let increasedNum = Number(last) + 1;
@@ -180,7 +180,7 @@ const totalPrice = total1;
 						orderNumber: orderNumber,
 						orderType: req.session.order.orderType,
 						paidType:'PAY AT COUNTER',
-						price: totalPrice.toFixed(2),
+						price: req.session.cart.totalPrice.toString(),
 						status: 'PENDING',
 						tableNumber:''
 					})

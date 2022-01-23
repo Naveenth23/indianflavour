@@ -114,7 +114,7 @@
                                     <% total = total + pizza.item.price*pizza.qty %>
                                 <tr>
                                     <td><%= pizza.item.itemName %> <span class="product-qty">x <%= pizza.qty %></span></td>
-                                    <td>$<%= pizza.item.price * pizza.qty %></td>
+                                    <td>$<%= (pizza.item.price * pizza.qty).toFixed(2) %></td>
                                 </tr>
                                 <% } %>
                             </tbody>
@@ -125,7 +125,7 @@
                                 </tr>
                                 <tr>
                                     <th>Total</th>
-                                    <td class="product-subtotal" id="product-subtotal">$<span><%= (total+session.cart.shippingCharge).toFixed(2) %></span></td>
+                                    <td class="product-subtotal" id="product-subtotal">$<span><%= (total).toFixed(2) %> </span></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -204,27 +204,6 @@
         }        
     }
 
-    function getdelivery(e, val) {
-        if (!$(this).is(':checked')) {
-            var matches = val.split('_');        
-            var area = matches[0];
-            var price = matches[1];
-            var pincode = matches[2];
-            var total_price = parseFloat($('#product-subtotal > span').html());
-            $('#shippingCharge').val(price);
-            $('#city').val(toTitleCase(area));
-            $('#pincode').val(pincode);
-            $('#delivery_charges > span').html(price);
-            $('#product-subtotal > span').html(total_price+parseFloat(price));
-            $.post('update-total', { price:total_price+parseFloat(price),shipping: parseFloat(price)}, function(data){
-                // $('#delivery_charges').html('$'+price);
-                // $('#product-subtotal').html('$'+data.total);
-            });
-            $('.close').trigger('click');
-        } else {
-            $("#chkroot").removeAttr('checked');
-        }
-    }
 
     function toTitleCase(str) {
         return str.replace(
@@ -266,7 +245,7 @@
         $('#city').val('');
         $('#pincode').val('');
         $('#delivery_charges > span').html('0');
-        $('#product-subtotal > span').html(total_price);
+        $('#product-subtotal > span').html(total_price.toFixed(2));
         // $.post('remove-delivery', function(data){
         //     $('#delivery_charges').html('$0');
         //     $('#product-subtotal').html('$'+data.total);

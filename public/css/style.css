@@ -2779,6 +2779,97 @@ a.order-btn {
 	border-top: 0;
 }
 
+
+.tm-preloader {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 100%;
+	background: #272635;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	z-index: 1000;
+	-webkit-transform-origin: 0 0;
+	-ms-transform-origin: 0 0;
+	transform-origin: 0 0;
+	-webkit-transition: all .6s ease-out 0s;
+	-o-transition: all .6s ease-out 0s;
+	transition: all .6s ease-out 0s
+}
+
+.tm-preloader-logo {
+	text-align: center
+}
+
+.tm-preloader-progress {
+	display: block;
+	height: 3px;
+	width: 100%;
+	background: #77768e;
+	margin-top: 30px;
+	position: relative;
+	overflow: hidden
+}
+
+.tm-preloader-progress::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background: #34a5b3;
+	-webkit-transform-origin: 0 0;
+	-ms-transform-origin: 0 0;
+	transform-origin: 0 0;
+	-webkit-animation: tmFillFull 4s linear 0s 1 both;
+	animation: tmFillFull 4s linear 0s 1 both
+}
+
+.tm-preloader .tm-button {
+	position: absolute;
+	left: auto;
+	top: auto;
+	right: 15px;
+	bottom: 15px;
+	border: 0
+}
+
+@-webkit-keyframes tmFillFull {
+	from {
+		-webkit-transform: scaleX(0);
+		transform: scaleX(0)
+	}
+	to {
+		-webkit-transform: scaleX(1);
+		transform: scaleX(1)
+	}
+}
+
+
+@keyframes tmFillFull {
+	from {
+		-webkit-transform: scaleX(0);
+		transform: scaleX(0)
+	}
+	to {
+		-webkit-transform: scaleX(1);
+		transform: scaleX(1)
+	}
+}
+
 /*===================================*
   04. END ABOUT STYLE
 *===================================*/
