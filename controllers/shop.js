@@ -320,6 +320,10 @@ const postContact = async (req, res, next) => {
     
 };
 
+const privacy = async(req, res, next) => {
+    res.render('shop/privacy', { pageTitle: 'Indian Flavours Byford Privacy Policy', path: '/shop', name: '' })
+};
+
 const postBooking = async (req, res, next) => {
     try {
         const {name, email,phone,booking_time,date,person } = req.body;
@@ -361,6 +365,7 @@ module.exports = {
   orderConfirm,
   getInvoice,
   contact,
+privacy,
   postBooking
 }
 
